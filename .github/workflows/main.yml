@@ -31,22 +31,15 @@ jobs:
                 Invoke-WebRequest -Uri ${{ secrets.OUTPUT_URL }} -OutFile "$(Get-Location)\cache\Output.7z"
                 7z x "$(Get-Location)\cache\Output.7z" -o"$(Get-Location)\Output"
 
-                if (-not $(git --version 2>$null)) {
-                    $commitHash = "NOT SET"
-                } else {
-                    $commitHash = git rev-parse --short HEAD
-                }
-
-                $timestamp = Get-Date -Format 'o'
-
                 @"
                 namespace SinmaiAssist {
                     public static partial class BuildInfo {
-                        public const string CommitHash = "$commitHash";
-                        public const string BuildDate = "$timestamp";
+                        public const string CommitHash = "$(git rev-parse --short HEAD)";
+                        public const string BuildDate = "$(Get-Date -Format 'o')";
                     }
                 }
                 "@ | Out-File -FilePath ".\BuildInfo.cs" -Encoding ascii
+                
                 dotnet build
                 mkdir ".\Out\Mods\"
                 mkdir ".\Out\UserLibs\"
@@ -60,12 +53,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: artifact
-        path: Out.zip
-
-    - name: create github release
-      id: new_release
-      uses: softprops/action-gh-release@v2.0.8
-      with:
-        name: latest
+        path: Out
         make_latest: true
         files: Out.zip
