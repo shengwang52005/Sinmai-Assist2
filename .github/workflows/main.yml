@@ -61,3 +61,11 @@ jobs:
       with:
         name: artifact
         path: Out.zip
+
+    - name: create github release
+      id: new_release
+      uses: softprops/action-gh-release@v2.0.8
+      with:
+        name: latest
+        make_latest: true
+        files: Out.zip
