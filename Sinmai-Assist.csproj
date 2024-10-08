@@ -7,7 +7,7 @@
     <ProjectGuid>{788BC472-59F7-46F6-B760-65C18BA74389}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sinmai-SlimMod</RootNamespace>
+    <RootNamespace>SinmaiAssist</RootNamespace>
     <AssemblyName>Sinmai-Assist</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -476,6 +476,8 @@
     <Compile Include="Common\ChangeDefaultOption.cs" />
     <Compile Include="Common\ChangeFadeStyle.cs" />
     <Compile Include="Common\CustomVersionText.cs" />
+    <Compile Include="Common\DisableBackground.cs" />
+    <Compile Include="Common\SkipFade.cs" />
     <Compile Include="Common\DisableMask.cs" />
     <Compile Include="Common\DummyAimeLogin.cs" />
     <Compile Include="Common\DummyChimeLogin.cs" />
@@ -504,6 +506,7 @@
     <Compile Include="GUI\MainGUI.cs" />
     <Compile Include="GUI\ShowVersionInfo.cs" />
     <Compile Include="GUI\Style.cs" />
+    <Compile Include="GUI\UserDataPanel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="SDGB\CustomCameraId.cs" />
@@ -513,6 +516,7 @@
     <Compile Include="Utils\GetUserId.cs" />
     <Compile Include="Utils\Keyboard.cs" />
     <Compile Include="Utils\Server.cs" />
+    <Compile Include="Utils\User.cs" />
     <Compile Include="Utils\UserLogout.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -26,6 +26,7 @@ namespace SinmaiAssist
     public class SinmaiAssist : MelonMod
     {
         private MainGUI _mainGUI;
+        private static bool isPatchFailed = false;
         public static ConfigManager config;
         public static bool IsSDGB = false;
         public static string gameID = "Unknown";
@@ -137,12 +138,14 @@ namespace SinmaiAssist
 
             // Common
             if (config.Common.InfinityTimer) Patch(typeof(InfinityTimer));
+            if (config.Common.DisableBackground) Patch(typeof(DisableBackground));
             if (config.Common.DisableMask) Patch(typeof(DisableMask));
             if (config.Common.SinglePlayer.Enable) Patch(typeof(SinglePlayer));
             if (config.Common.ForwardATouchRegionToButton) Patch(typeof(ForwardATouchRegionToButton));
             if (config.Common.QuickBoot) Patch(typeof(QuickBoot));
             if (config.Common.BlockCoin) Patch(typeof(BlockCoin));
             if (config.Common.SkipWarningScreen) Patch(typeof(SkipWarningScreen));
+            if (config.Common.SkipFade) Patch(typeof(SkipFade));
             if (config.Common.NetworkLogger.Enable) Patch(typeof(NetworkLogger));
             if (config.Common.CustomVersionText.Enable) Patch(typeof(CustomVersionText));
             if (config.Common.IgnoreAnyGameInformation) Patch(typeof(IgnoreAnyGameInformation));
@@ -174,6 +177,7 @@ namespace SinmaiAssist
             Patch(typeof(InputManager));
             Patch(typeof(GameMessageManager));
             
+            if(isPatchFailed) PatchFailedWarn();
             MelonLogger.Msg("Loading completed");
         }
 
@@ -206,6 +210,7 @@ namespace SinmaiAssist
                 MelonLogger.Error(e.TargetSite);
                 MelonLogger.Error(e.InnerException);
                 MelonLogger.Error(e.StackTrace);
+                isPatchFailed = true;
                 return false;
             }
         }
@@ -223,6 +228,17 @@ namespace SinmaiAssist
                             $"\r\n Version: {BuildInfo.Version} ({BuildInfo.CommitHash}) Build Date: {BuildInfo.BuildDate}" +
                             $"\r\n Author: {BuildInfo.Author}");
             MelonLogger.Warning("This is a cheat mod. Use at your own risk!");
+        }
+
+        private static void PatchFailedWarn()
+        {
+            MelonLogger.Warning("\r\n=================================================================" +
+                                "\r\nFailed to patch some methods." +
+                                "\r\nPlease ensure that you are using an unmodified version of Assembly-CSharp.dll with a version greater than 1.40.0," +
+                                "\r\nas modifications or lower versions can cause function mismatches, preventing the required functions from being found." +
+                                "\r\nCheck for conflicting mods, or enabled incompatible options." +
+                                "\r\nIf you believe this is an error, please report the issue to the mod author." +
+                                "\r\n=================================================================");
         }
     }
 }
