@@ -13,6 +13,7 @@ public class UserDataPanel
 {
     private static UserData _player1 = null;
     private static UserData _player2 = null;
+    private static bool _isNewItem = false;
     
     private enum CollectionType
     {
@@ -27,7 +28,7 @@ public class UserDataPanel
     
     public static void OnGUI()
     {
-        GUILayout.Label($"User Info:");
+        GUILayout.Label($"User Info", MainGUI.Style.Title);
         try
         {
             _player1 = Singleton<UserDataManager>.Instance.GetUserData(0);
@@ -37,15 +38,15 @@ public class UserDataPanel
         {
             // ignore
         }
-        GUILayout.Label($"1P: {_player1.Detail.UserName} ({_player1.Detail.UserID})");
-        GUILayout.Label($"2P: {_player2.Detail.UserName} ({_player2.Detail.UserID})");
+        GUILayout.Label($"1P: {_player1.Detail.UserName} ({_player1.Detail.UserID})", MainGUI.Style.Text);
+        GUILayout.Label($"2P: {_player2.Detail.UserName} ({_player2.Detail.UserID})", MainGUI.Style.Text);
         
         GUILayout.Label("Add Collections", MainGUI.Style.Title);
         foreach (CollectionType type in Enum.GetValues(typeof(CollectionType)))
         {
             GUILayout.BeginHorizontal();
             int typeId = (int)type;
-            GUILayout.Label(type.ToString(), new GUIStyle(UnityEngine.GUI.skin.label){fixedWidth = 50});
+            GUILayout.Label(type.ToString(), new GUIStyle(MainGUI.Style.Text){fixedWidth = 50});
             _userInputId[typeId] = GUILayout.TextField(_userInputId[typeId]);
             if (GUILayout.Button("Add", new GUIStyle(UnityEngine.GUI.skin.button){ fixedWidth = 50}))
             {
@@ -54,10 +55,11 @@ public class UserDataPanel
             }
             GUILayout.EndHorizontal();
         }
+        _isNewItem = GUILayout.Toggle(_isNewItem, "Is New Item");
         
         GUILayout.Label("Unlock Music", MainGUI.Style.Title);
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Music", new GUIStyle(UnityEngine.GUI.skin.label){fixedWidth = 50});
+        GUILayout.Label("Music", new GUIStyle(MainGUI.Style.Text){fixedWidth = 50});
         _userInputId[0] = GUILayout.TextField(_userInputId[0]);
         if (GUILayout.Button("Add", new GUIStyle(UnityEngine.GUI.skin.button){ fixedWidth = 50}))
         {
@@ -79,30 +81,30 @@ public class UserDataPanel
         UserData userData = Singleton<UserDataManager>.Instance.GetUserData(index);
         if (userData.IsGuest())
         {
-            GameMessageManager.SendGameMessage("Guest Account\nUnable to add collections", (int)index);
+            GameMessageManager.SendMessage((int)index,"Guest Account\nUnable to add collections");
             return;
         }
         try
         {
             if (int.TryParse(input, out int id))
             {
-                if (userData.AddCollections((UserData.Collection)type, id))
+                if (userData.AddCollections((UserData.Collection)type, id, _isNewItem))
                 {
-                    GameMessageManager.SendGameMessage($"Add Collections \n{type} {id}", (int)index);
+                    GameMessageManager.SendMessage((int)index,$"Add Collections \n{type} {id}" + (_isNewItem ? " (New Item)" : "") );
                 }
                 else
                 {
-                    GameMessageManager.SendGameMessage($"Failed to add Collections \n{type} {id}", (int)index);
+                    GameMessageManager.SendMessage((int)index,$"Failed to add Collections or already added\n{type} {id}");
                 }
             }
             else
             {
-                GameMessageManager.SendGameMessage($"Invalid ID\n {input}", (int)index);
+                GameMessageManager.SendMessage((int)index,$"Invalid ID\n {input}");
             }
         }
         catch (Exception e)
         {
-            GameMessageManager.SendGameMessage($"Unknown error", (int)index);
+            GameMessageManager.SendMessage((int)index,$"Unknown error");
             MelonLogger.Error(e);
         }
     }
@@ -112,7 +114,7 @@ public class UserDataPanel
         UserData userData = Singleton<UserDataManager>.Instance.GetUserData(index);
         if (userData.IsGuest())
         {
-            GameMessageManager.SendGameMessage("Guest Account\nUnable to unlock music", (int)index);
+            GameMessageManager.SendMessage((int)index,"Guest Account\nUnable to unlock music");
             return;
         }
         try
@@ -123,32 +125,32 @@ public class UserDataPanel
                 {
                     if (userData.AddUnlockMusic(UserData.MusicUnlock.Base, id))
                     {
-                        GameMessageManager.SendGameMessage($"Unlock Music \n{id}", (int)index);
+                        GameMessageManager.SendMessage((int)index,$"Unlock Music \n{id}");
                     }
                     else
                     {
-                        GameMessageManager.SendGameMessage($"Failed to unlock music \n{id}", (int)index);
+                        GameMessageManager.SendMessage((int)index,$"Failed to unlock music or already unlocked \n{id}");
                     }
                 }
                 else if(!userData.IsUnlockMusic(UserData.MusicUnlock.Master, id))
                 {
                     userData.AddUnlockMusic(UserData.MusicUnlock.Master, id);
                     userData.AddUnlockMusic(UserData.MusicUnlock.ReMaster, id);
-                    GameMessageManager.SendGameMessage($"Unlock Master \n{id}", (int)index);
+                    GameMessageManager.SendMessage((int)index,$"Unlock Master \n{id}");
                 }
                 else
                 {
-                    GameMessageManager.SendGameMessage($"Music not found or already unlocked\n{id}", (int)index);
+                    GameMessageManager.SendMessage((int)index,$"Failed to unlock Master or already unlocked\n{id}");
                 }
             }
             else
             {
-                GameMessageManager.SendGameMessage($"Invalid ID\n {input}", (int)index);
+                GameMessageManager.SendMessage((int)index,$"Invalid ID\n {input}");
             }
         }
         catch (Exception e)
         {
-            GameMessageManager.SendGameMessage($"Unknown error", (int)index);
+            GameMessageManager.SendMessage((int)index,$"Unknown error");
             MelonLogger.Error(e);
         }
     }

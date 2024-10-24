@@ -37,12 +37,15 @@ public class ChartTimer
         TimeSkipAdd3,
         TimeSkipSub,
         TimeSkipSub2,
-        TimeSkipSub3
+        TimeSkipSub3,
+        Set,
+        Back
     }
 
     public static Button ButtonStatus = Button.None;
     public static bool IsPlaying = false;
     public static double Timer = 0.0;
+    public static int recordTime = 0;
     private static MovieController gameMovie;
     private static NotesManager notesManager;
     private static GameProcess gameProcess;
@@ -63,6 +66,7 @@ public class ChartTimer
             {
                 IsPlaying = true;
                 Timer = 0.0;
+                recordTime = 0;
             }
             if (sequence == GameSequence.Play)
             {
@@ -85,7 +89,7 @@ public class ChartTimer
                         SoundManager.PauseMusic(false);
                         gameMovie.Pause(false);
                         NotesManager.Pause(false);
-                        //debugFeature.DebugTimeSkip(0);
+                        //TimeSkip(0);
                     }
                     IsPlaying = !IsPlaying;
                 }
@@ -99,7 +103,19 @@ public class ChartTimer
                     Singleton<GamePlayManager>.Instance.Initialize(IsPartyPlay);
                     TimeSkip(16);
                 }
-                else if (ButtonStatus != Button.None && ButtonStatus != Button.Pause)
+                else if (DebugInput.GetKeyDown(KeyCode.DownArrow) || ButtonStatus == Button.Set)
+                {
+                    recordTime = (int)Timer;
+                    MelonLogger.Msg($"Record Time: {recordTime}");
+                }
+                else if (DebugInput.GetKeyDown(KeyCode.UpArrow) || ButtonStatus == Button.Back)
+                {
+                    int time = recordTime == 0 ? -999999 : -(int)Timer - recordTime;
+                    TimeSkip(time);
+                    TimeSkip(0);
+                    MelonLogger.Msg($"Time Jump: {recordTime}({time})");
+                }
+                else if (ButtonStatus != Button.None)
                 {
                     Singleton<GamePlayManager>.Instance.Initialize(IsPartyPlay);
                     switch (ButtonStatus)
@@ -123,7 +139,7 @@ public class ChartTimer
                             TimeSkip(-2500);
                             break;
                         case Button.Reset:
-                            TimeSkip(-999999);
+                            Singleton<GamePlayManager>.Instance.SetQuickRetryFrag(flag: true);
                             break;
                         default:
                             break;

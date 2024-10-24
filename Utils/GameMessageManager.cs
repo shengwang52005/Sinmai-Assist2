@@ -9,16 +9,16 @@ namespace SinmaiAssist.Utils;
 
 public class GameMessageManager
 {
-    public static IGenericManager manager { get; private set; }
+    private static IGenericManager _manager;
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ProcessManager), "SetMessageManager")]
     public static void SetMessageManager(IGenericManager genericManager)
     {
-        manager = genericManager;
+        _manager = genericManager;
     }
 
-    public static void SendGameMessage(string message)
+    public static void SendMessage(int monitorId, string message, string title = null, WindowPositionID positionID = WindowPositionID.Middle, WindowMessageID messageID = WindowMessageID.CollectionAttentionEmptyFavorite)
     {
         try
         {
@@ -28,10 +28,18 @@ public class GameMessageManager
                 text = message,
                 replaceText = true,
                 changeSize = true,
-                sizeID = WindowSizeID.Middle
+                sizeID = WindowSizeID.Middle,
+                positionID = positionID
             };
-            manager.Enqueue(0, WindowMessageID.CollectionAttentionEmptyFavorite, param);
-            manager.Enqueue(1, WindowMessageID.CollectionAttentionEmptyFavorite, param);
+            if (title != null)
+            {
+                if (messageID == WindowMessageID.CollectionAttentionEmptyFavorite)
+                    messageID = WindowMessageID.AimeUseNotice;
+                param.replaceTitle = true;
+                param.hideTitle = false;
+                param.title = title;
+            }
+            _manager.Enqueue(monitorId, messageID, positionID, param);
         }
         catch (Exception e)
         {
@@ -39,23 +47,25 @@ public class GameMessageManager
         }
     }
 
-    public static void SendGameMessage(string message, int monitorId)
+    public static void SendWarning(int monitorId, string message, string title, float lifeTime = 3000)
     {
         try
         {
-            WindowParam param = new WindowParam()
-            {
-                hideTitle = true,
-                text = message,
-                replaceText = true,
-                changeSize = true,
-                sizeID = WindowSizeID.Middle
-            };
-            manager.Enqueue(monitorId, WindowMessageID.CollectionAttentionEmptyFavorite, param);
-        }
-        catch (Exception e)
+            WarningWindowInfo warning = new WarningWindowInfo(
+                title: title,
+                message: message,
+                lifeTime: lifeTime,
+                monitorId: monitorId
+            );
+            _manager.EnqueueWarning(warning);
+        }catch (Exception e)
         {
             MelonLogger.Error(e);
         }
+    }
+    
+    public static IGenericManager GetMessageManager()
+    {
+        return _manager;
     }
 }

@@ -19,7 +19,6 @@ namespace SinmaiAssist
         }
 
         // 提供公共属性访问
-        public ChinaConfig China => _config.China;
         public CommonConfig Common => _config.Common;
         public CheatConfig Cheat => _config.Cheat;
         public FixConfig Fix => _config.Fix;
@@ -34,18 +33,12 @@ namespace SinmaiAssist
 
     public class Config
     {
-        public ChinaConfig China { get; set; }
         public CommonConfig Common { get; set; }
         public CheatConfig Cheat { get; set; }
         public FixConfig Fix { get; set; }
         public ModSettingConfig ModSetting { get; set; }
     }
-
-    public class ChinaConfig
-    {
-        public CustomCameraIdConfig CustomCameraId { get; set; }
-    }
-
+    
     public class DummyLoginConfig
     {
         public bool Enable { get; set; }
@@ -55,7 +48,9 @@ namespace SinmaiAssist
     public class CustomCameraIdConfig
     {
         public bool Enable { get; set; }
-        public int QrCameraId { get; set; }
+        public int ChimeCameraId { get; set; }
+        public int LeftQrCameraId { get; set; }
+        public int RightQrCameraId { get; set; }
         public int PhotoCameraId { get; set; }
     }
 
@@ -65,6 +60,7 @@ namespace SinmaiAssist
         public bool DisableMask { get; set; }
         public bool DisableBackground { get; set; }
         public bool ShowFPS { get; set; }
+        public bool ForceQuickRetry { get; set; }
         public bool ForwardATouchRegionToButton { get; set; }
         public bool SkipFade { get; set; }
         public bool SkipWarningScreen { get; set; }
@@ -77,7 +73,8 @@ namespace SinmaiAssist
         public NetworkLoggerConfig NetworkLogger { get; set; }
         public CustomVersionTextConfig CustomVersionText { get; set; }
         public DummyLoginConfig DummyLogin { get; set; }
-
+        public CustomCameraIdConfig CustomCameraId { get; set; }
+        public ChangeGameSettingsConfig ChangeGameSettings { get; set; }
     }
 
     public class SinglePlayerConfig
@@ -96,6 +93,15 @@ namespace SinmaiAssist
     {
         public bool Enable { get; set; }
         public string VersionText { get; set; }
+    }
+
+    public class ChangeGameSettingsConfig
+    {
+        public bool Enable { get; set; }
+        public bool CodeRead { get; set; }
+        public bool IconPhoto { get; set; }
+        public bool UploadPhoto { get; set; }
+        public bool CharaSelect { get; set; }
     }
 
     public class CheatConfig
@@ -132,6 +138,7 @@ namespace SinmaiAssist
     {
         public bool ShowInfo { get; set; }
         public bool ShowPanel { get; set; }
+        public bool LogUnity { get; set; }
         public bool ForceIsChinaBuild { get; set; }
         public bool SafeMode { get; set; }
     }

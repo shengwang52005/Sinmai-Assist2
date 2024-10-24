@@ -10,6 +10,7 @@ using SinmaiAssist.GUI;
 using SinmaiAssist.SDGB;
 using SinmaiAssist.Utils;
 using UnityEngine;
+using Path = System.IO.Path;
 
 namespace SinmaiAssist
 {
@@ -34,6 +35,8 @@ namespace SinmaiAssist
 
         public override void OnInitializeMelon()
         {
+            File.Delete($"{BuildInfo.Name}/Unity.log");
+            Application.logMessageReceived += OnLogMessageReceived; // 注册Unity日志
             PrintLogo();
             _mainGUI = new MainGUI();
             config = new ConfigManager();
@@ -51,6 +54,7 @@ namespace SinmaiAssist
             {
                 config.Initialize(yamlFilePath);
                 DummyLoginPanel.DummyUserId = config.Common.DummyLogin.DefaultUserId.ToString();
+                DebugPanel.UnityLogger = config.ModSetting.LogUnity;
                 MelonLogger.Msg("Config Load Complete.");
             }
             catch (Exception e)
@@ -123,10 +127,9 @@ namespace SinmaiAssist
                 }
             }
             
-            // SDGB
-            if (config.China.CustomCameraId.Enable)
+            if (config.Common.CustomCameraId.Enable)
             {
-                if (config.Common.DummyLogin.Enable)
+                if (config.Common.DummyLogin.Enable && IsSDGB)
                 {
                     MelonLogger.Warning("DummyLogin enabled, CustomCameraId has been automatically disabled.");
                 }
@@ -141,6 +144,7 @@ namespace SinmaiAssist
             if (config.Common.DisableBackground) Patch(typeof(DisableBackground));
             if (config.Common.DisableMask) Patch(typeof(DisableMask));
             if (config.Common.SinglePlayer.Enable) Patch(typeof(SinglePlayer));
+            if (config.Common.ForceQuickRetry) Patch(typeof(ForceQuickRetry));
             if (config.Common.ForwardATouchRegionToButton) Patch(typeof(ForwardATouchRegionToButton));
             if (config.Common.QuickBoot) Patch(typeof(QuickBoot));
             if (config.Common.BlockCoin) Patch(typeof(BlockCoin));
@@ -151,6 +155,7 @@ namespace SinmaiAssist
             if (config.Common.IgnoreAnyGameInformation) Patch(typeof(IgnoreAnyGameInformation));
             if (config.Common.ChangeDefaultOption) Patch(typeof(ChangeDefaultOption));
             if (config.Common.ChangeFadeStyle) Patch(typeof(ChangeFadeStyle));
+            if (config.Common.ChangeGameSettings.Enable) Patch(typeof(ChangeGameSettings));
 
             //Fix
             if (config.Fix.DisableEncryption) Patch(typeof(DisableEncryption));
@@ -186,6 +191,31 @@ namespace SinmaiAssist
             _mainGUI.OnGUI();
             if (config.Common.ShowFPS) ShowFPS.OnGUI();
             if (config.ModSetting.ShowInfo) ShowVersionInfo.OnGUI();
+        }
+        
+        private void OnLogMessageReceived(string condition, string stackTrace, LogType type)
+        {
+            string logString = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{type}] {condition}\n{stackTrace}";
+
+            File.AppendAllText(Path.Combine($"{BuildInfo.Name}/Unity.log"),logString + "\n");
+            if (DebugPanel.UnityLogger)
+            {
+                switch (type)
+                {
+                    case LogType.Error:
+                    case LogType.Exception:
+                        MelonLogger.Error($"[UnityLogger] [{type}]: {condition}\n{stackTrace}");
+                        break;
+                    case LogType.Warning:
+                        MelonLogger.Warning($"[UnityLogger] [{type}]: {condition}\n{stackTrace}");
+                        break;
+                    case LogType.Assert:
+                    case LogType.Log:
+                    default:
+                        MelonLogger.Msg($"[UnityLogger] [{type}]: {condition}\n{stackTrace}");
+                        break;
+                }
+            }
         }
 
         private static bool Patch(Type type)

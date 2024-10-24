@@ -1,10 +1,4 @@
-﻿china:
-  customCameraId: 
-    enable : false
-    qrCameraId: 0
-    photoCameraId: 0
- 
-common:
+﻿common:
   infinityTimer: false
   disableMask: false
   disableBackground: false
@@ -12,6 +6,7 @@ common:
   singlePlayer: 
     enable: false
     hideSubMonitor: false
+  forceQuickRetry: false
   forwardATouchRegionToButton: false
   skipFade: false
   skipWarningScreen: false
@@ -19,6 +14,7 @@ common:
   blockCoin: false
   ignoreAnyGameInformation: false
   changeDefaultOption: false
+  changeFadeStyle: false
   networkLogger:
     enable: false
     printToConsole: false
@@ -28,7 +24,19 @@ common:
   dummyLogin:
     enable: false
     defaultUserId: 0
-  changeFadeStyle: false
+  customCameraId:
+    enable: false
+    chimeCameraId: 0
+    leftQrCameraId: 0
+    rightQrCameraId: 0
+    photoCameraId: 0
+  changeGameSettings:
+    enable: false
+    codeRead: false
+    iconPhoto: false
+    uploadPhoto: false
+    charaSelect: false
+    
 
 cheat:
   autoPlay: false
@@ -57,5 +65,6 @@ fix:
 modSetting:
   showInfo: false
   showPanel: false
+  logUnity: false
   forceIsChinaBuild: false
   safeMode: false

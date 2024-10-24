@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using MAI2.Util;
+using MAI2System;
 using Manager;
 using MelonLoader.TinyJSON;
 using Net.VO.Mai2;
+using Path = System.IO.Path;
 
 namespace SinmaiAssist.Utils;
 
@@ -15,7 +18,7 @@ public class User
         UserData userData = Singleton<UserDataManager>.Instance.GetUserData(index);
         if (userData.IsGuest())
         {
-            GameMessageManager.SendGameMessage("Guest Account\nUnable to export backup", (int)index);
+            GameMessageManager.SendMessage((int)index,"Guest Account\nUnable to export backup");
             return;
         }
         string path = $"{BuildInfo.Name}/UserBackup";
@@ -39,7 +42,7 @@ public class User
             Directory.CreateDirectory(path);
         }
         File.WriteAllText(Path.Combine(path, $"User{userData.Detail.UserID}-{timestamp}.json"), userDataJson);
-        GameMessageManager.SendGameMessage($"Export Backup Data:\nUser{userData.Detail.UserID}-{timestamp}.json", (int)index);
+        GameMessageManager.SendMessage((int)index,$"Export Backup Data:\nUser{userData.Detail.UserID}-{timestamp}.json");
     }
 
     public static string GetCharacterList(UserData userData)
@@ -86,11 +89,23 @@ public class User
         list += "}]";
         return list;
     }
-    
+
     public static UserData GetUserData(long index)
     {
         return Singleton<UserDataManager>.Instance.GetUserData(index);
     }
+
+    public static string GetUserIdString(long index)
+    {
+        // 通过方法调用来获取常量值
+        var guestUserIdBase = GetGuestUserIDBase();
+        var userId = Singleton<UserDataManager>.Instance.GetUserData(index).Detail.UserID;
+        return userId == guestUserIdBase ? "Guest" : userId.ToString();
+    }
     
-    
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static ulong GetGuestUserIDBase()
+    {
+        return ConstParameter.GuestUserIDBase;
+    }
 }

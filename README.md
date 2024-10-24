@@ -18,11 +18,13 @@ This is a cheat Mod, using by your own risk.
     - Set All Character As Same And Lock
 - Common
     - Dummy Login
+    - Custom Camera ID
 	- Block Coin
 	- Custom Version Text
 	- Disable Mask
     - Disable Background
 	- Forward Touch Region To Button
+    - Force Quick Retry
 	- Network Logger
 	- Print User Information
     - Export User Data
@@ -33,14 +35,13 @@ This is a cheat Mod, using by your own risk.
     - Skip Fade
     - Ignore Information
     - Change Default Option
+    - Change Game Settings
 - Fix
 	- Disable Encryption
 	- Disable Reboot
 	- Fix DebugInput
 	- Rewrite Judge Timing
 	- Skip Version Check
-- CN(?)
-	- Custom Camera ID
 
 
 ### Development
